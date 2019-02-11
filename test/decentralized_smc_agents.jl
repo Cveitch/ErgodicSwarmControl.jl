@@ -1,4 +1,4 @@
-using ErgodicControl
+Pkg.using ErgodicControl
 using ErgodicControlPlots
 
 # Set up different domains with different discretizations

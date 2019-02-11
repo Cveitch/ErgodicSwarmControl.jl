@@ -104,6 +104,56 @@ function gradients!(ad::MF, bd::MF, em::ErgodicManager, vtm::Vector{TrajectoryMa
 end
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+# This version is for decentralized multi agents
+function gradients!(ad::MF, bd::MF, em::ErgodicManager, vtm::Vector{TrajectoryManager}, xd::VVF, ud::VVF)
+
+	# must first create xds, where each agent trajectory is its own vector
+	xds, uds = vvf2vvvf(xd, ud, vtm)
+
+	ck = decompose(em, xds)
+	n_idx = 1
+	m_idx = 1
+	N = length(xd) - 1
+	num_agents = length(vtm)
+	for j = 1:num_agents
+		tm = vtm[j]
+		adt = zeros(tm.dynamics.n, N+1)
+		bdt = zeros(tm.dynamics.m, N)
+		n_rows = tm.dynamics.n
+		m_rows = tm.dynamics.m
+		gradients!(adt, bdt, em, tm, xds[j], uds[j], ck)
+		ad[n_idx:(n_idx+n_rows-1), :] = adt / num_agents
+		bd[m_idx:(m_idx+m_rows-1), :] = bdt / num_agents
+		n_idx += n_rows
+		m_idx += m_rows
+	end
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # TODO: make this functional
 function add_barrier_gradient!(ad::MF, em::ErgodicManager, tm::TrajectoryManager)
 	if tm.barrier_cost > 0.0
@@ -138,7 +188,7 @@ function compute_ans(em::ErgodicManagerR2, xd::VVF, tm::TrajectoryManager, n::In
 
 	an_x = 0.0
 	an_y = 0.0
-	 
+
 	xm = x_min(em)
 	ym = y_min(em)
 
@@ -171,7 +221,7 @@ function compute_ans(em::ErgodicManagerR3, xd::VVF, tm::TrajectoryManager, n::In
 	an_x = 0.0
 	an_y = 0.0
 	an_z = 0.0
-	 
+
 	xm = x_min(em)
 	ym = y_min(em)
 	zm = z_min(em)
@@ -214,7 +264,7 @@ function compute_ans(em::ErgodicManagerR2T, xd::VVF, tm::TrajectoryManager, n::I
 
 	an_x = 0.0
 	an_y = 0.0
-	 
+
 	xm = x_min(em)
 	ym = y_min(em)
 
@@ -256,7 +306,7 @@ function compute_ans(em::ErgodicManagerSE2, xd::VVF, tm::TrajectoryManager, n::I
 	r2 = x*x + y*y	# range squared
 	r = sqrt(r2)
 	psi = atan2(y, x)
-	 
+
     # TODO: this needs to be scrubbed real well, especially since I changed
     #        from em.M being an integer to a range
 	#for m = 0:em.M

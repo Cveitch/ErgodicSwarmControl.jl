@@ -58,6 +58,63 @@ type TrajectoryManager
 
 		return tm
 	end
+
+
+
+
+	function TrajectoryManager(x0::Vector{Float64}, h::Real, N::Int, i::Initializer=RandomInitializer())
+		tm = new()
+
+		# needed for all trajectories
+		tm.N = N
+		tm.h = h
+		tm.x0 = deepcopy(x0)
+
+		# needed for ergodic trajectories
+		tm.Qn = eye(2)
+		tm.q = 1.0
+		tm.R = 0.01 * eye(2)
+		tm.Rn = eye(2)
+		tm.barrier_cost = 0.
+		tm.initializer = i
+		tm.descender = ArmijoLineSearch()
+
+		# dynamics stuff
+		tm.dynamics = LinearDynamics(eye(2), tm.h*eye(2))
+		tm.int_scheme = ForwardEuler()
+
+		return tm
+	end
+
+
+
+
+	function TrajectoryManager(em::ErgodicManagerR2T, x0::Vector{Float64}, h::Real, N::Int, i::Initializer=RandomInitializer())
+		tm = new()
+
+		# needed for all trajectories
+		tm.N = N
+		tm.h = h
+		tm.x0 = deepcopy(x0)
+		tm.ck = zeros(em.K+1, em.K+1)
+		tm.xy = deepcopy(x0)
+		# needed for ergodic trajectories
+		tm.Qn = eye(2)
+		tm.q = 1.0
+		tm.R = 0.01 * eye(2)
+		tm.Rn = eye(2)
+		tm.barrier_cost = 0.
+		tm.initializer = i
+		tm.descender = ArmijoLineSearch()
+
+		# dynamics stuff
+		tm.dynamics = LinearDynamics(eye(2), tm.h*eye(2))
+		tm.int_scheme = ForwardEuler()
+
+		return tm
+	end
+
+
 end
 
 #typealias VTM Vector{TrajectoryManager}
