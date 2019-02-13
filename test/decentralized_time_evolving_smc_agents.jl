@@ -18,7 +18,7 @@ em = ErgodicManagerR2T(d, phi, K)
 
 # Set up first trajectory manager
 x0 = [0.49,0.01]
-h = 0.05
+h = 0.015
 ci = ConstantInitializer([0.0, 0.0])
 tm1 = TrajectoryManager(em, x0, h, N, ci)
 tm1.xy = [0.49, 0.01]

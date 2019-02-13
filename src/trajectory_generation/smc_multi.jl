@@ -168,6 +168,14 @@ function update_ck_s(em::ErgodicManager, xds::VVVF, n::Int, vtm::VTM, threshold:
 				hk = em.hk[k1+1, k2+1]
 				vtm[agent].ck[k1+1, k2+1] *= (n-1)
 				for j = 1:num_agents
+					#Check for local agents
+					local_agents = 0
+					for i = 1:num_agents
+						eu = euclidean(vtm[agent].xy, vtm[i].xy)
+						if eu < threshold
+							local_agents += 1
+						end
+					end
 					#if statement goes here to check for agent distance
 					euc = euclidean(vtm[agent].xy, vtm[j].xy)
 					#print(vtm[agent].x0, vtm[j].x0)
@@ -180,7 +188,7 @@ function update_ck_s(em::ErgodicManager, xds::VVVF, n::Int, vtm::VTM, threshold:
 						cy = cos(k2*pi*dyn/Ly)
 
 						# compute ck
-						vtm[agent].ck[k1+1, k2+1] += cx*cy/(hk*num_agents)
+						vtm[agent].ck[k1+1, k2+1] += cx*cy/(hk*local_agents)
 					end
 				end
 				vtm[agent].ck[k1+1, k2+1] /= n
