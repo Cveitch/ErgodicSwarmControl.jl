@@ -27,7 +27,7 @@ type TrajectoryManager
 	Rn::Matrix{Float64}
 	barrier_cost::Float64
 	ck::Matrix{Float64}
-
+	ckt::Array{Float64,3}
 	initializer::Initializer
 	descender::Descender
 	dynamics::Dynamics
@@ -50,7 +50,7 @@ type TrajectoryManager
 		tm.Rn = eye(2)
 		tm.barrier_cost = 0.
 		tm.initializer = i
-		tm.descender = ArmijoLineSearch()
+		# tm.descender = ArmijoLineSearch()
 
 		# dynamics stuff
 		tm.dynamics = LinearDynamics(eye(2), tm.h*eye(2))
@@ -106,7 +106,8 @@ type TrajectoryManager
 		tm.barrier_cost = 0.
 		tm.initializer = i
 		tm.descender = ArmijoLineSearch()
-
+		# # needed for swarm ergodic time-evolving trajectories
+		tm.ckt = zeros(em.K+1, em.K+1, em.K+1)
 		# dynamics stuff
 		tm.dynamics = LinearDynamics(eye(2), tm.h*eye(2))
 		tm.int_scheme = ForwardEuler()
